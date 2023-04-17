@@ -5,21 +5,21 @@ import subprocess
 
 helpstring = """
 -? a asin       | Exibe os 10 comentarios mais uteis no produto [asin].
-                    Os 5 primeiros têm a maior avaliação e os 5 últimos têm a menor.
+                  Os 5 primeiros têm a maior avaliação e os 5 últimos têm a menor.
 
 -? b asin       | Lista os produtos similares ao produto [asin] que são mais vendidos que ele.
 
 -? c asin       | Exibe a evolução por dia da média de avaliações do produto [asin].
 
--? d              | Lista os 10 produtos mais vendidos de cada grupo.
+-? d            | Lista os 10 produtos mais vendidos de cada grupo.
 
--? e              | Lista os 10 produtos com maior média de avaliações úteis positivas.
+-? e            | Lista os 10 produtos com maior média de avaliações úteis positivas.
 
--? f              | Lista as 5 categorias com maior média de avaliações úteis positivas por produto.
+-? f            | Lista as 5 categorias com maior média de avaliações úteis positivas por produto.
 
--? g              | Lista 10 clientes que mais fizeram comentários por grupo de produto
+-? g            | Lista 10 clientes que mais fizeram comentários por grupo de produto
 
--? q              | Encerra programa
+-? q            | Encerra programa
 """
 
 print("\n\n\n")
@@ -123,5 +123,5 @@ while True:
             ORDER BY avaliacao DESC
             FETCH FIRST 10 ROW ONLY;"""
 
-    r = subprocess.run("psql -U postgres tp1 -c \"" + sql + "\"",
+    r = subprocess.run("psql -h localhost -U postgres tp1 -c \"" + sql + "\"",
                        shell = True)

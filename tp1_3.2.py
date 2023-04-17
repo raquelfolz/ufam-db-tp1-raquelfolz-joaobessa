@@ -4,6 +4,7 @@
 
 import subprocess
 import psycopg2
+import sys
 
 def fixquote(s):
     l = []
@@ -56,14 +57,14 @@ foreign key (ASIN_FK) references PRODUTO (ASIN)
 
 
 # deleta banco de dados se ja existir
-r = subprocess.run("psql -U postgres postgres -c \"DROP DATABASE tp1;\"",
+r = subprocess.run("psql -h localhost -U postgres postgres -c \"DROP DATABASE tp1;\"",
                    shell = True)
 # cria banco de dados
-r = subprocess.run("createdb tp1 -O postgres",
+r = subprocess.run("createdb tp1 -O postgres -h localhost -U postgres",
                    shell = True)
 
 
-conn = psycopg2.connect("dbname=tp1 user=postgres host=postgres")
+conn = psycopg2.connect("dbname=tp1 user=postgres host=localhost password=postgres")
 
 # cria esquema do bd
 cur = conn.cursor()
@@ -73,7 +74,15 @@ cur.close()
 conn.commit()
 
 # adiciona elementos do arquivo
-f = open('amazon-meta.txt', 'r', encoding="utf-8")
+amazon_meta = sys.argv[1] if len(sys.argv) > 1 else 'amazon-meta.txt'
+
+try:
+    f = open(amazon_meta, 'r', encoding="utf-8")
+except FileNotFoundError as e:
+    print("amazon-meta.txt not found", file=sys.stderr)
+    print("Please add the file to this folder or specify the location", file=sys.stderr)
+    print(f"Usage:  python {sys.argv[0]} amazon-meta-file", file=sys.stderr)
+    sys.exit(1)
 fsimilar = open('.similar.txt', 'w', encoding="utf-8")
 fcategorias = open('.categorias.txt', 'w', encoding="utf-8")
 freview = open('.review.txt', 'w', encoding="utf-8")
