@@ -127,7 +127,7 @@ while True:
         sql = """SELECT categoria_id, nome, avg_reviews_positivas FROM ( (
               SELECT categoria_id_fk AS categoria_id, AVG(cnt_review) AS avg_reviews_positivas
               FROM    ( (SELECT asin_fk, COUNT(review_id) AS cnt_review
-              FROM (SELECT * FROM review WHERE avaliacao >= 4) AS rv
+              FROM (SELECT * FROM review WHERE avaliacao >= 4 AND utilidade > votos/2) AS rv
               GROUP BY asin_fk) AS foo
               NATURAL JOIN relacao_produto_categoria ) AS rv
               GROUP BY categoria_id_fk
