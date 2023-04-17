@@ -1,3 +1,11 @@
+#Amazon file
+amazon-meta.txt
+
+#auxiliary files
+.similar.txt
+.categorias.txt
+.review.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
