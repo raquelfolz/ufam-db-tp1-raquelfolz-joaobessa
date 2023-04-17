@@ -123,5 +123,17 @@ while True:
             ORDER BY avaliacao DESC
             FETCH FIRST 10 ROW ONLY;"""
 
+    if l[0] == 'f':
+        sql = """SELECT categoria_id, nome, avg_reviews_positivas FROM ( (
+              SELECT categoria_id_fk AS categoria_id, AVG(cnt_review) AS avg_reviews_positivas
+              FROM    ( (SELECT asin_fk, COUNT(review_id) AS cnt_review
+              FROM (SELECT * FROM review WHERE avaliacao >= 4) AS rv
+              GROUP BY asin_fk) AS foo
+              NATURAL JOIN relacao_produto_categoria ) AS rv
+              GROUP BY categoria_id_fk
+              ) AS foo NATURAL JOIN categoria) AS rv
+              ORDER BY avg_reviews_positivas DESC
+              LIMIT 5;"""
+
     r = subprocess.run("psql -h localhost -U postgres tp1 -c \"" + sql + "\"",
                        shell = True)
