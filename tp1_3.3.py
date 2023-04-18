@@ -40,14 +40,16 @@ grupos = ["",
 while True:
     try:
         l = input('-? ')
+        l = l.lower().split()
     except EOFError:
         break
+    if len(l) == 0:
+        continue
 
     if l[0] == 'q':
         break
 
-    if l[0] == 'a':
-        l = l.split()
+    elif l[0] == 'a':
         try:
             sql = """
             SELECT * FROM
@@ -61,8 +63,7 @@ while True:
             print("Comando precisa de ASIN do produto")
             continue
 
-    if l[0] == 'b':
-        l = l.split()
+    elif l[0] == 'b':
         try:
             sql = """
             SELECT b.asin, b.titulo, b.ranking
@@ -77,8 +78,7 @@ while True:
         except IndexError:
             print("Comando precisa de ASIN do produto")
             continue
-    if l[0] == 'c':
-        l = l.split()
+    elif l[0] == 'c':
         try:
             sql = """ SELECT data_review,
             avg(avaliacao) AS avaliacao
@@ -90,7 +90,7 @@ while True:
             print("Comando precisa de ASIN do produto")
             continue
 
-    if l[0] == 'd':
+    elif l[0] == 'd':
         sql = "SELECT * FROM (("
         sql += " UNION ".join([f"""
             (SELECT asin, titulo, ranking, grupo
@@ -101,7 +101,7 @@ while True:
         """ for x in grupos])
         sql += ")) aux ORDER BY grupo, ranking;"
 
-    if l[0] == 'e':
+    elif l[0] == 'e':
         sql = """ SELECT asin, titulo,
             avg(avaliacao) AS avaliacao FROM
             (SELECT asin_fk, avaliacao FROM review WHERE
@@ -112,7 +112,7 @@ while True:
             ORDER BY avaliacao DESC
             FETCH FIRST 10 ROW ONLY;"""
 
-    if l[0] == 'f':
+    elif l[0] == 'f':
         sql = """SELECT categoria_id, nome, avg_reviews_positivas FROM ( (
               SELECT categoria_id_fk AS categoria_id, AVG(cnt_review) AS avg_reviews_positivas
               FROM    ( (SELECT asin_fk, COUNT(review_id) AS cnt_review
@@ -124,7 +124,7 @@ while True:
               ORDER BY avg_reviews_positivas DESC
               LIMIT 5;"""
 
-    if l[0] == 'g':
+    elif l[0] == 'g':
         sql = "SELECT * FROM (("
         sql += " UNION ".join([f"""
             (SELECT grupo, id_cliente, COUNT(*) AS tot_comment
@@ -135,6 +135,11 @@ while True:
              LIMIT 10)
         """ for x in grupos])
         sql += ")) aux ORDER BY grupo, tot_comment DESC;"
+
+    else:
+        print("Consulta invalida")
+        print(helpstring)
+        continue
 
 
     r = subprocess.run("psql -h localhost -U postgres tp1 -c \"" + sql + "\"",
