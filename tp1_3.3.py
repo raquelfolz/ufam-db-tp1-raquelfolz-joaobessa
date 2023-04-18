@@ -124,5 +124,18 @@ while True:
               ORDER BY avg_reviews_positivas DESC
               LIMIT 5;"""
 
+    if l[0] == 'g':
+        sql = "SELECT * FROM (("
+        sql += " UNION ".join([f"""
+            (SELECT grupo, id_cliente, COUNT(*) AS tot_comment
+             FROM produto JOIN review ON asin=asin_fk 
+             GROUP BY id_cliente, grupo
+             HAVING grupo = '{x}'
+             ORDER BY tot_comment DESC
+             LIMIT 10)
+        """ for x in grupos])
+        sql += ")) aux ORDER BY grupo, tot_comment DESC;"
+
+
     r = subprocess.run("psql -h localhost -U postgres tp1 -c \"" + sql + "\"",
                        shell = True)
