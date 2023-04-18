@@ -116,7 +116,7 @@ while True:
         sql = """ SELECT asin, titulo,
             avg(avaliacao) AS avaliacao FROM
             (SELECT asin_fk, avaliacao FROM review WHERE
-            utilidade > 0 AND avaliacao > 0) aux,
+            utilidade > votos/2 AND avaliacao > 0) aux,
             produto
             WHERE asin = asin_fk
             GROUP BY asin
