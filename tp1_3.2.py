@@ -57,21 +57,32 @@ foreign key (ASIN_FK) references PRODUTO (ASIN)
 
 
 # deleta banco de dados se ja existir
+print("Deletando banco de dados (caso ja tenha sido criado)")
+print("Caso o banco de dados nao exista, um erro sera reportado.")
+print("Esse erro nao afeta o funcionamento do programa.")
 r = subprocess.run("psql -h localhost -U postgres postgres -c \"DROP DATABASE tp1;\"",
                    shell = True)
+
 # cria banco de dados
+print("Criando novo banco de dados tp1")
 r = subprocess.run("createdb tp1 -O postgres -h localhost -U postgres",
                    shell = True)
-
+if r.returncode == 0:
+    print("Banco de dados criado com sucesso")
+else:
+    print("Nao foi possivel criar o banco de dados. Tente novamente.")
+    sys.exit(1)
 
 conn = psycopg2.connect("dbname=tp1 user=postgres host=localhost password=postgres")
 
 # cria esquema do bd
+print("Criando esquema do bd")
 cur = conn.cursor()
 for table in esquema:
     cur.execute(table)
 cur.close()
 conn.commit()
+print("Esquema do bd criado")
 
 # adiciona elementos do arquivo
 amazon_meta = sys.argv[1] if len(sys.argv) > 1 else 'amazon-meta.txt'
@@ -90,6 +101,7 @@ freview = open('.review.txt', 'w', encoding="utf-8")
 categorias = dict()
 
 cur = conn.cursor()
+print("Lendo arquivo de entrada")
 
 line = f.readline()
 line = f.readline()
@@ -113,8 +125,8 @@ while True:
 
     line = f.readline()
     asin = line[6:-1]
-    if id % 1000 == 0:
-        print(id)
+    #if id % 1000 == 0:
+    #    print(id)
 
     line = f.readline()
     l = line[2:-1]
@@ -183,12 +195,14 @@ while True:
 cur.close()
 conn.commit()
 
+print("Arquivo lido com sucesso")
+
 f.close()
 fsimilar.close()
 fcategorias.close()
 freview.close()
 
-print("Povoando categorias")
+print("Preenchendo tabela categorias")
 cur = conn.cursor()
 for cat in categorias:
     x = categorias[cat]
@@ -197,8 +211,9 @@ for cat in categorias:
     cur.execute(sql)
 cur.close()
 conn.commit()
+print("Tabela categorias preenchida")
 
-print("Povoando similar")
+print("Preenchendo tabela similar")
 cur = conn.cursor()
 fsimilar = open('.similar.txt', 'r', encoding="utf-8")
 for line in fsimilar:
@@ -207,11 +222,12 @@ for line in fsimilar:
          f"VALUES('{asin}', '{item}');"
     cur.execute(sql)
 fsimilar.close()
+print("Tabela similar preenchida")
 
 cur.close()
 conn.commit()
 
-print("Povoando relacao_produto_categoria")
+print("Preenchendo tabela relacao_produto_categoria")
 cur = conn.cursor()
 fcategorias = open('.categorias.txt', 'r', encoding="utf-8")
 for line in fcategorias:
@@ -222,8 +238,9 @@ for line in fcategorias:
 fcategorias.close()
 cur.close()
 conn.commit()
+print("Tabela relacao_produto_categoria preenchida")
 
-print("Povoando review")
+print("Preenchendo tabela review")
 cur = conn.cursor()
 freview = open('.review.txt', 'r', encoding="utf-8")
 for line in freview:
@@ -234,6 +251,9 @@ for line in freview:
 freview.close()
 cur.close()
 conn.commit()
+print("Tabela review preenchida")
 
 
 conn.close()
+
+print("Banco de dados tp1 criado e preenchido com sucesso")
