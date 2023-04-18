@@ -25,6 +25,18 @@ helpstring = """
 print("\n\n\n")
 print(helpstring)
 
+grupos = ["",
+          "Video Games",
+          "Video",
+          "Toy",
+          "Sports",
+          "Software",
+          "Music",
+          "DVD",
+          "CE",
+          "Book",
+          "Baby Product"]
+
 while True:
     try:
         l = input('-? ')
@@ -79,38 +91,15 @@ while True:
             continue
 
     if l[0] == 'd':
-        sql = """
-            SELECT * FROM
-            (((SELECT asin, titulo, ranking, grupo
-              FROM PRODUTO WHERE
-              grupo = 'Book' AND
-              ranking > -0
-              ORDER BY ranking
-              FETCH FIRST 10 ROW ONLY)
-            UNION
+        sql = "SELECT * FROM (("
+        sql += " UNION ".join([f"""
             (SELECT asin, titulo, ranking, grupo
-              FROM PRODUTO WHERE
-              grupo = 'DVD' AND
-              ranking > 0
-              ORDER BY ranking
-              FETCH FIRST 10 ROW ONLY))
-            UNION
-            ((SELECT asin, titulo, ranking, grupo
-              FROM PRODUTO WHERE
-              grupo = 'Video' AND
-              ranking > 0
-              ORDER BY ranking
-              FETCH FIRST 10 ROW ONLY)
-            UNION
-            (SELECT asin, titulo, ranking, grupo
-              FROM PRODUTO WHERE
-              grupo = 'Music' AND
-              ranking > 0
-
-              ORDER BY ranking
-              FETCH FIRST 10 ROW ONLY))) aux
-
-            ORDER BY grupo, ranking;"""
+             FROM PRODUTO WHERE
+             grupo = '{x}' AND ranking > 0
+             ORDER BY ranking
+             LIMIT 10)
+        """ for x in grupos])
+        sql += ")) aux ORDER BY grupo, ranking;"
 
     if l[0] == 'e':
         sql = """ SELECT asin, titulo,
